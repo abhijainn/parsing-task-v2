@@ -1,10 +1,4 @@
-data/
-data/
-.env
-.env.*
-data/
-.env
-.env.*
+__pycache__/
 data/
 .env
 .env.*

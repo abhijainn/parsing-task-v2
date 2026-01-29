@@ -40,3 +40,26 @@ def crop_and_save_figures(page_path: Path, out_dir: Path, layout) -> list[dict]:
         })
         fig_idx += 1
     return figures
+
+
+def extract_text_blocks(layout, img_shape, pad: int = 12) -> list[dict]:
+    h, w = img_shape[:2]
+    blocks = []
+    for block in layout:
+        if block.type not in {"Text", "Title", "List", "Table"}:
+            continue
+        x1, y1, x2, y2 = map(int, block.coordinates)
+        x1 = max(0, x1 - pad)
+        y1 = max(0, y1 - pad)
+        x2 = min(w, x2 + pad)
+        y2 = min(h, y2 + pad)
+        if x2 <= x1 or y2 <= y1:
+            continue
+        blocks.append({
+            "type": block.type,
+            "bbox": [x1, y1, x2, y2],
+            "score": float(block.score) if hasattr(block, "score") else None,
+        })
+
+    blocks.sort(key=lambda b: (b["bbox"][1], b["bbox"][0]))
+    return blocks
